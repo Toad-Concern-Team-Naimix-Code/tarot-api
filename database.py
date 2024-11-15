@@ -2,7 +2,9 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
+load_dotenv()
 # Подключение к базе данных PostgreSQL
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:3009@localhost:5432/tarot_db")
 engine = create_engine(DATABASE_URL)

@@ -1,6 +1,8 @@
 import psycopg2
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Получаем данные из переменных окружения
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
@@ -27,7 +29,8 @@ try:
         host=DB_HOST,
         port=DB_PORT,
         user=DB_USER,
-        password=DB_PASSWORD
+        password=DB_PASSWORD,
+        database=DB_NAME
     )
     connection.autocommit = True  # Включаем автофиксацию изменений
     cursor = connection.cursor()
