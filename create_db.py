@@ -21,7 +21,11 @@ def execute_sql_script(cursor, file_path):
     """Функция для выполнения SQL скрипта из файла"""
     with open(file_path, 'r', encoding='utf-8') as file:
         sql = file.read()
-        cursor.execute(sql)
+        try:
+          cursor.execute(sql)
+          print(f"Скрипт {file_path} выполнен успешно")
+        except Exception as e: 
+          print(f"Ошибка при выполнении скрипта {file_path}:{e}")
 
 # Соединяемся с сервером PostgreSQL
 try:
@@ -44,24 +48,22 @@ try:
     else:
         print(f"База данных {DB_NAME} уже существует")
 
-    cursor.close()
-    connection.close()
-
     # После создания базы данных подключаемся к ней и выполняем SQL скрипты
-    connection = psycopg2.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME
-    )
-    cursor = connection.cursor()
+    cursor.execute("SELECT current_database();")
+    print(f"Текущая база данных: {cursor.fetchone()[0]}")
 
     # Выполняем SQL скрипты
     print(f"Выполняю скрипт {MAJOR_ARCANA_SQL} для создания таблиц Major Arcana")
     execute_sql_script(cursor, MAJOR_ARCANA_SQL)
+    connection.commit()
     print(f"Выполняю скрипт {TAROT_HR_INSIGHTS_SQL} для создания таблиц Tarot HR Insights")
     execute_sql_script(cursor, TAROT_HR_INSIGHTS_SQL)
+    connection.commit()
+
+    # Проверим, что все создалось
+    cursor.execute("SELECT * FROM major_arcana;")
+    rows = cursor.fetchall()
+    print("Содержимое таблицы major_arcana:", rows) 
 
     # Закрываем курсор и соединение
     cursor.close()

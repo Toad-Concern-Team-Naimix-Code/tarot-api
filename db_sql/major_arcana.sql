@@ -1,6 +1,3 @@
-\c tarot_db;
-
-
 CREATE TABLE IF NOT EXISTS major_arcana (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
