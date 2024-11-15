@@ -1,5 +1,3 @@
-\c tarot_db;
-
 CREATE TABLE IF NOT EXISTS tarot_hr_insights (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
