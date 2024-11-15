@@ -85,3 +85,55 @@ python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 Перейдя по странице, можно увидеть документацию
 http://localhost:8000/docs#
+
+
+### Постоянный запуск приложения
+
+#### Создание файла службы:
+1. Создайте файл `/etc/systemd/system/uvicorn_app.service`:
+```
+sudo nano /etc/systemd/system/uvicorn_app.service
+```
+2. Вставьте следующее содержимое:
+```
+[Unit]
+Description=Uvicorn App
+After=network.target
+
+[Service]
+User=<your_user>  # Замените на ваше имя пользователя
+WorkingDirectory=<path_to_your_project>  # Укажите путь к папке с проектом
+ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+3. Сохраните файл и закройте редактор.
+
+#### Запуск службы:
+
+1. Перезагрузите `systemd`:
+```
+sudo systemctl daemon-reload
+```
+
+2. Запустите службу:
+```
+sudo systemctl start uvicorn_app
+```
+
+3. Настройте автоматический запуск при загрузке системы:
+```
+sudo systemctl enable uvicorn_app
+```
+
+#### Проверка статуса службы:
+```
+sudo systemctl status uvicorn_app
+```
+
+#### Остановка службы:
+```
+sudo systemctl stop uvicorn_app
+```
