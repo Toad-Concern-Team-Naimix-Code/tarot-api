@@ -41,7 +41,7 @@ GRANT ALL PRIVILEGES ON DATABASE tarot_db TO tarot_user;
 
 ```
 cd /path/to/your/project
-python -m venv venv
+python3 -m venv venv
 pip install -r requirements.txt
 ```
 
@@ -65,7 +65,7 @@ DB_NAME=tarot_db
 Запустите скрипт create_db.py:
 
 ```
-python create_db.py
+python3 create_db.py
 ```
 
 ### Развертывание приложения
@@ -75,7 +75,7 @@ python create_db.py
 Запустите приложение с помощью Uvicorn:
 
 ```
-python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Перейдя по странице, можно увидеть документацию
