@@ -19,3 +19,11 @@ class TarotHRInsights(Base):
     description = Column(Text, nullable=False)
     workplace_relationship_interpretation = Column(Text, nullable=False)
     career_interpretation = Column(Text, nullable=False)
+
+class TarotHRGroupInsights(Base):
+    __tablename__ = "tarot_hr_group_insights"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+    workplace_relationship_interpretation = Column(Text, nullable=False)
