@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import logging
 from datetime import datetime
 from typing import List
+from pydantic import BaseModel
 
 import models
 import db
@@ -37,7 +38,7 @@ def get_card(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Card not found")
     return card
 
-# Маршрут для получения всех карт
+# Маршрут для получения всех карт MajorArcana
 @app.get("/cards")
 def get_all_cards(db: Session = Depends(get_db)):
     cards = db.query(models.MajorArcana).all()
@@ -53,6 +54,7 @@ def get_hr_insight(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="HR insight not found")
     return insight
 
+# Маршрут для получения всех карт TarotHRInsights
 @app.get("/hr-insights")
 def get_hr_insight(db: Session = Depends(get_db)):
     cards = db.query(models.TarotHRInsights).all()
@@ -80,25 +82,25 @@ def validate_and_sum_date(date_str: str) -> int:
         return -1  # Можно вернуть любое значение, например, -1, чтобы указать на ошибку
 
 # Маршрут для получения карты по дате рождения
-@app.get("arcane/{birth_date}")
+@app.get("/arcane/{birth_date}")
 def get_arcane(birth_date: str, db: Session = Depends(get_db)):
     arcane = validate_and_sum_date(birth_date)
     if arcane == -1:
         raise HTTPException(status_code=400, detail="Bad request. Syntax error in birth_date")
     card = db.query(models.MajorArcana).filter(models.MajorArcana.id == arcane).first()
     if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+        raise HTTPException(status_code=404, detail=f"Card not found, ID Card: {arcane}")
     return card
 
 # Маршрут для hr-инсайта по дате рождения
-@app.get("arcane-candidate/{birth_date}")
+@app.get("/arcane-candidate/{birth_date}")
 def get_arcane_candidate(birth_date: str, db: Session = Depends(get_db)):
     arcane = validate_and_sum_date(birth_date)
     if arcane == -1:
         raise HTTPException(status_code=400, detail="Bad request. Syntax error in birth_date")
     card = db.query(models.TarotHRInsights).filter(models.TarotHRInsights.id == arcane).first()
     if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+        raise HTTPException(status_code=404, detail=f"Card not found, ID Card: {arcane}")
     return card
 
 # Функция для обработки списка дат
@@ -114,13 +116,24 @@ def validate_and_sum_dates(birth_dates: List[str]) -> int:
     total_sum = (total_sum - 1) % 22 + 1
     return total_sum
 
+
+class BirthDatesRequest(BaseModel):
+    birth_dates: List[str]
+
 # Маршрут для описания отношений в коллективе по датам рождения людей в коллективе
-@app.get("arcane-group/")
-def get_arcane_candidate(birth_dates: List[str], db: Session = Depends(get_db)):
-    arcane = validate_and_sum_dates(birth_dates)
+@app.post("/arcane-group")
+def get_arcane_candidate(request: BirthDatesRequest, db: Session = Depends(get_db)):
+    arcane = validate_and_sum_dates(request.birth_dates)
     if arcane == -1:
         raise HTTPException(status_code=400, detail="Bad request. Syntax error in dates")
     card = db.query(models.TarotHRGroupInsights).filter(models.TarotHRGroupInsights.id == arcane).first()
     if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
+        raise HTTPException(status_code=404, detail=f"Card not found, ID Card: {arcane}")
     return card
+
+# Маршрут для получения всех карт TarotHRGroupInsights
+@app.get("/arcane-group")
+def get_arcane_candidate(db: Session = Depends(get_db)):
+    cards = db.query(models.TarotHRGroupInsights).all()
+    return cards
+    

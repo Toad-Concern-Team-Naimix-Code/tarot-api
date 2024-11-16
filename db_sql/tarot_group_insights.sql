@@ -1,11 +1,11 @@
-CREATE TABLE tarot_hr_group_insights (
+CREATE TABLE IF NOT EXISTS tarot_group_insights (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     workplace_relationship_interpretation TEXT NOT NULL
 );
 
-INSERT INTO tarot_hr_group_insights (name, description, workplace_relationship_interpretation) VALUES
+INSERT INTO tarot_group_insights (name, description, workplace_relationship_interpretation) VALUES
 ('Шут', 
  'Шут — это карта свежих начинаний, которые ещё не испробованы. Он готов броситься в новое, не заботясь о последствиях. Так что если в вашей команде кто-то решился на новый проект, это его момент!',
  'В команде Шутов всегда будет много энергии и вдохновения. Все будут готовы к новым идеям и вызовам, но иногда может возникнуть путаница, потому что Шуты порой слишком легкомысленны. Важно, чтобы коллектив сохранял фокус и понимал, когда нужна серьёзность.'),
@@ -94,4 +94,4 @@ INSERT INTO tarot_hr_group_insights (name, description, workplace_relationship_i
  'Мир — это карта завершения, гармонии и успеха. Она символизирует полноту и завершённость, когда все элементы приходят к своему логичному завершению. В вашей команде всегда будет момент, когда коллектив достигнет своей цели и почувствует полное удовлетворение.',
  'В команде Мира всегда будет ощущение гармонии и завершённости. Это коллектив, который достигает своих целей и ощущает удовлетворение от проделанной работы. Важно, чтобы команда не теряла интерес к дальнейшему развитию, а продолжала искать новые горизонты для достижения ещё больших успехов.');
 
-SELECT * FROM tarot_hr_group_insights;
+SELECT * FROM tarot_group_insights;
