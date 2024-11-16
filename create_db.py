@@ -16,46 +16,24 @@ DB_SQL_PATH = os.path.join(os.path.dirname(__file__), "db_sql")
 # Путь к SQL скриптам
 MAJOR_ARCANA_SQL = os.path.join(DB_SQL_PATH, "major_arcana.sql")
 TAROT_HR_INSIGHTS_SQL = os.path.join(DB_SQL_PATH, "tarot_hr_insights.sql")
-TAROT_HR_GROUP_INSIGHTS_SQL = os.path.join(DB_SQL_PATH, "tarot_hr_group_insights.sql")
-
-def execute_sql_script_first_time(cursor, file_path):
-    """Функция для выполнения SQL скрипта из файла"""
-    with open(file_path, 'r', encoding='utf-8') as file:
-        sql = file.read()
-        try:
-          cursor.execute(sql)
-          print(f"Скрипт {file_path} выполнен успешно")
-        except Exception as e: 
-          print(f"Ошибка при выполнении скрипта {file_path}:{e}")
+TAROT_HR_GROUP_INSIGHTS_SQL = os.path.join(DB_SQL_PATH, "tarot_group_insights.sql")
 
 def execute_sql_script(cursor, table_name, sql_insert):
     """Функция для вставки данных в таблицу, если в ней меньше 22 записей"""
-    cursor.execute(f"""
-        SELECT EXISTS (
-            SELECT 1
-            FROM pg_catalog.pg_tables
-            WHERE tablename = '{table_name}'
-        );
-    """)
-    table_exists = cursor.fetchone()[0]
-    
-    if not table_exists:
-        cursor.execute(sql_insert)
-        print(f"Данные для таблицы {table_name} добавлены успешно.")
-        return
+    cursor.execute(f"DROP TABLE IF EXISTS {table_name} CASCADE;")
+    print(f"Таблица {table_name} успешно удалена.")
 
-    cursor.execute(f"SELECT COUNT(*) FROM {table_name};")
-    row_count = cursor.fetchone()[0]
-    if row_count >= 22:
-        print(f"В таблице {table_name} уже 22 записи, новые записи добавлены не будут.")
-        return
-
-    # Если записей меньше 22, выполняем вставку
     try:
         cursor.execute(sql_insert)
-        print(f"Данные для таблицы {table_name} добавлены успешно.")
+        print(f"Таблица {table_name} успешно создана.")
+        
+        # Сбрасываем последовательность для нового значения id
+        cursor.execute(f"""
+            SELECT setval('{table_name}_id_seq', COALESCE((SELECT MAX(id) FROM {table_name}), 1), false);
+        """)
+        print(f"Последовательность для {table_name}_id_seq сброшена на правильное значение.")
     except Exception as e:
-        print(f"Ошибка при добавлении данных в таблицу {table_name}: {e}")
+        print(f"Ошибка при выполнении скрипта для таблицы {table_name}: {e}")
 
 # Соединяемся с сервером PostgreSQL
 try:
@@ -95,14 +73,11 @@ try:
     execute_sql_script(cursor, 'tarot_hr_insights', sql_insert)
     connection.commit()
 
+    with open(TAROT_HR_GROUP_INSIGHTS_SQL, 'r', encoding='utf-8') as file:
+            sql_insert = file.read()
     print(f"Выполняю скрипт {TAROT_HR_GROUP_INSIGHTS_SQL} для создания таблиц Tarot HR Group Insights")
-    execute_sql_script_first_time(cursor, TAROT_HR_GROUP_INSIGHTS_SQL)
+    execute_sql_script(cursor, 'tarot_group_insights', sql_insert)
     connection.commit()
-
-    # Проверим, что все создалось
-    cursor.execute("SELECT * FROM tarot_hr_group_insights;")
-    rows = cursor.fetchall()
-    print("Содержимое таблицы tarot_hr_group_insights:", rows) 
 
     # Закрываем курсор и соединение
     cursor.close()
