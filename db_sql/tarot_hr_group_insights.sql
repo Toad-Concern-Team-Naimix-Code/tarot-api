@@ -1,4 +1,4 @@
-CREATE TABLE tarot_hr_group_insights (
+CREATE TABLE IF NOT EXISTS tarot_hr_group_insights (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
